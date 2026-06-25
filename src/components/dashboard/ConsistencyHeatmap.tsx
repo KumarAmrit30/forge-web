@@ -1,5 +1,7 @@
 "use client";
 
+import { useMemo } from "react";
+import { useCalendarStore } from "@/stores/calendarStore";
 import { getHeatmapData, groupHeatmapByWeek } from "@/lib/heatmap";
 import { GlassCard } from "@/components/shared/GlassCard";
 import { cn } from "@/lib/utils";
@@ -12,8 +14,12 @@ const COLORS = {
 };
 
 export function ConsistencyHeatmap() {
-  const data = getHeatmapData(90);
-  const weeks = groupHeatmapByWeek(data);
+  const days = useCalendarStore((s) => s.days);
+
+  const weeks = useMemo(() => {
+    const data = getHeatmapData(90);
+    return groupHeatmapByWeek(data);
+  }, [days]);
 
   return (
     <GlassCard className="space-y-3">

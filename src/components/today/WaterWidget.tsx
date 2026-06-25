@@ -1,5 +1,6 @@
 "use client";
 
+import { useMemo } from "react";
 import { useWaterStore } from "@/stores/waterStore";
 import { useSettingsStore } from "@/stores/settingsStore";
 import { syncTodayFromStores } from "@/lib/sync-day";
@@ -21,11 +22,13 @@ type Props = {
 
 export function WaterWidget({ compact, showTimeline = true }: Props) {
   const today = todayKey();
-  const todayLog = useWaterStore((s) => s.dailyLogs[today]);
-  const total = todayLog?.totalMl ?? 0;
-  const entries = todayLog?.entries ?? EMPTY_ENTRIES;
+  const dailyLogs = useWaterStore((s) => s.dailyLogs);
   const goal = useSettingsStore((s) => s.profile.dailyWaterGoal);
   const addWater = useWaterStore((s) => s.addWater);
+
+  const todayLog = useMemo(() => dailyLogs[today], [dailyLogs, today]);
+  const total = todayLog?.totalMl ?? 0;
+  const entries = todayLog?.entries ?? EMPTY_ENTRIES;
 
   const pct = Math.min(100, Math.round((total / goal) * 100));
   const remaining = Math.max(0, goal - total);

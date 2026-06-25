@@ -149,7 +149,17 @@ export type Priority = {
   impactScore: number;
   category: string;
   actionType: string;
+  section: TodaySection;
 };
+
+export type TodaySection =
+  | "morning"
+  | "nutrition"
+  | "water"
+  | "workout"
+  | "habits"
+  | "night"
+  | "sleep";
 
 export type WeightLog = {
   date: string;

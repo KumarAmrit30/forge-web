@@ -1,4 +1,4 @@
-import type { Priority, PriorityRank, DayRecord } from "@/types";
+import type { Priority, PriorityRank, DayRecord, TodaySection } from "@/types";
 import { useSettingsStore } from "@/stores/settingsStore";
 import { useWorkoutStore } from "@/stores/workoutStore";
 import { getTodayRecord } from "@/lib/scoring";
@@ -8,6 +8,7 @@ type Candidate = {
   impactScore: number;
   category: string;
   actionType: string;
+  section: TodaySection;
 };
 
 const RANKS: PriorityRank[] = ["P1", "P2", "P3", "P4", "P5"];
@@ -15,7 +16,9 @@ const RANKS: PriorityRank[] = ["P1", "P2", "P3", "P4", "P5"];
 export function generatePriorities(record?: Partial<DayRecord>): Priority[] {
   const r = record ?? getTodayRecord();
   const profile = useSettingsStore.getState().profile;
-  const nextWorkout = useWorkoutStore.getState().getNextWorkout();
+  const plan = useWorkoutStore.getState().plan;
+  const cycle = useWorkoutStore.getState().cycle;
+  const nextWorkout = plan.days[cycle.currentIndex] ?? null;
   const hour = new Date().getHours();
   const candidates: Candidate[] = [];
 
@@ -27,16 +30,18 @@ export function generatePriorities(record?: Partial<DayRecord>): Priority[] {
       impactScore: impact,
       category: "Fitness",
       actionType: "workout",
+      section: "workout",
     });
   }
 
   const proteinGap = profile.dailyProteinGoal - (r.proteinG ?? 0);
   if (proteinGap > 0) {
     candidates.push({
-      label: `${Math.round(proteinGap)}g Protein Remaining`,
+      label: `${Math.round(proteinGap)}g protein remaining`,
       impactScore: 80 * (proteinGap / profile.dailyProteinGoal),
       category: "Nutrition",
       actionType: "protein",
+      section: "nutrition",
     });
   }
 
@@ -44,22 +49,29 @@ export function generatePriorities(record?: Partial<DayRecord>): Priority[] {
   if (waterGap > 0) {
     const liters = (waterGap / 1000).toFixed(1);
     candidates.push({
-      label: `Drink ${liters}L Water`,
+      label: `Drink ${liters}L water`,
       impactScore: 70 * (waterGap / profile.dailyWaterGoal),
       category: "Health",
       actionType: "water",
+      section: "water",
     });
   }
 
-  const minoxidilDone = r.nightChecklist?.["Apply Minoxidil"];
+  const minoxidilKey = Object.keys(r.nightChecklist ?? {}).find((k) =>
+    k.toLowerCase().includes("minoxidil")
+  );
+  const minoxidilDone = minoxidilKey
+    ? r.nightChecklist?.[minoxidilKey]
+    : true;
   if (!minoxidilDone) {
     let impact = 60;
     if (hour >= 20) impact += 30;
     candidates.push({
-      label: "Apply Minoxidil Tonight",
+      label: "Apply Minoxidil tonight",
       impactScore: impact,
       category: "Haircare",
       actionType: "minoxidil",
+      section: "night",
     });
   }
 
@@ -68,10 +80,11 @@ export function generatePriorities(record?: Partial<DayRecord>): Priority[] {
     let impact = 50;
     if (hour >= 22) impact += 40;
     candidates.push({
-      label: "Sleep Before 11 PM",
+      label: "Log sleep goal",
       impactScore: impact,
       category: "Health",
       actionType: "sleep",
+      section: "sleep",
     });
   }
 
@@ -79,20 +92,22 @@ export function generatePriorities(record?: Partial<DayRecord>): Priority[] {
   const morningPending = Object.entries(morningItems).filter(([, v]) => !v);
   if (morningPending.length > 0 && hour < 12) {
     candidates.push({
-      label: `Complete Morning Skincare (${morningPending.length} left)`,
+      label: `Morning routine (${morningPending.length} left)`,
       impactScore: 40,
       category: "Skincare",
       actionType: "skincare",
+      section: "morning",
     });
   }
 
   const stepsGap = profile.dailyStepsGoal - (r.steps ?? 0);
   if (stepsGap > 0) {
     candidates.push({
-      label: `${stepsGap.toLocaleString()} Steps Remaining`,
+      label: `${stepsGap.toLocaleString()} steps remaining`,
       impactScore: 30 * (stepsGap / profile.dailyStepsGoal),
       category: "Fitness",
       actionType: "steps",
+      section: "nutrition",
     });
   }
 
@@ -105,5 +120,10 @@ export function generatePriorities(record?: Partial<DayRecord>): Priority[] {
       impactScore: c.impactScore,
       category: c.category,
       actionType: c.actionType,
+      section: c.section,
     }));
+}
+
+export function todaySectionHref(section: TodaySection): string {
+  return `/today#${section}`;
 }

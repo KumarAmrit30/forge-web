@@ -2,33 +2,31 @@
 
 import { useState, useRef } from "react";
 import { useSettingsStore } from "@/stores/settingsStore";
-import { useGoalStore } from "@/stores/goalStore";
-import { useHabitStore } from "@/stores/habitStore";
-import { useNotificationStore } from "@/stores/notificationStore";
 import { GlassCard } from "@/components/shared/GlassCard";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
-import { WorkoutEditor } from "@/components/workout/WorkoutEditor";
-import { ReviewHistory } from "@/components/review/ReviewHistory";
 import { exportDataBackup, exportFullBackup, importBackup } from "@/lib/backup";
 import {
   requestNotificationPermission,
   syncRemindersToSW,
 } from "@/lib/notifications";
-import { generateId } from "@/lib/id";
+import { useNotificationStore } from "@/stores/notificationStore";
+import { runSeed } from "@/lib/seed";
 import { toast } from "sonner";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 
 export function SettingsContent() {
   const profile = useSettingsStore((s) => s.profile);
   const setProfile = useSettingsStore((s) => s.setProfile);
-  const goals = useGoalStore((s) => s.goals);
-  const addGoal = useGoalStore((s) => s.addGoal);
-  const removeGoal = useGoalStore((s) => s.removeGoal);
-  const habits = useHabitStore((s) => s.habits);
-  const addHabit = useHabitStore((s) => s.addHabit);
-  const removeHabit = useHabitStore((s) => s.removeHabit);
   const reminders = useNotificationStore((s) => s.reminders);
   const addReminder = useNotificationStore((s) => s.addReminder);
   const removeReminder = useNotificationStore((s) => s.removeReminder);
@@ -37,106 +35,136 @@ export function SettingsContent() {
   const setNotifEnabled = useNotificationStore((s) => s.setEnabled);
 
   const fileRef = useRef<HTMLInputElement>(null);
-  const [newGoalTitle, setNewGoalTitle] = useState("");
-  const [newHabitTitle, setNewHabitTitle] = useState("");
+  const [importOpen, setImportOpen] = useState(false);
+  const [pendingFile, setPendingFile] = useState<File | null>(null);
 
-  const handleImport = async (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
+    setPendingFile(file);
+    setImportOpen(true);
+  };
+
+  const confirmImport = async () => {
+    if (!pendingFile) return;
     try {
-      await importBackup(file);
+      await importBackup(pendingFile);
       toast.success("Backup restored successfully");
     } catch {
       toast.error("Failed to import backup");
+    } finally {
+      setImportOpen(false);
+      setPendingFile(null);
     }
+  };
+
+  const reseed = () => {
+    useSettingsStore.getState().setHasSeeded(false);
+    runSeed();
+    toast.success("Blueprint and routines re-seeded");
   };
 
   return (
     <div className="space-y-6 px-4 pt-6 pb-8">
       <header>
         <h1 className="text-2xl font-bold tracking-tight">Settings</h1>
-        <p className="text-sm text-muted-foreground">Forge — Built Daily.</p>
+        <p className="text-sm text-muted-foreground">
+          Profile, notifications, and data safety.
+        </p>
       </header>
 
       <GlassCard className="space-y-4">
-        <h2 className="font-semibold">Profile & Targets</h2>
+        <h2 className="font-semibold">Profile</h2>
         <div className="grid grid-cols-2 gap-3">
-          <div>
+          <div className="col-span-2">
             <Label className="text-xs">Name</Label>
-            <Input value={profile.name} onChange={(e) => setProfile({ name: e.target.value })} />
+            <Input
+              value={profile.name}
+              onChange={(e) => setProfile({ name: e.target.value })}
+            />
           </div>
           <div>
-            <Label className="text-xs">Current Weight</Label>
-            <Input type="number" value={profile.currentWeight} onChange={(e) => setProfile({ currentWeight: parseFloat(e.target.value) })} />
+            <Label className="text-xs">Current Weight (kg)</Label>
+            <Input
+              type="number"
+              step="0.1"
+              value={profile.currentWeight}
+              onChange={(e) =>
+                setProfile({ currentWeight: parseFloat(e.target.value) })
+              }
+            />
           </div>
           <div>
-            <Label className="text-xs">Target Weight</Label>
-            <Input type="number" value={profile.targetWeight} onChange={(e) => setProfile({ targetWeight: parseFloat(e.target.value) })} />
+            <Label className="text-xs">Target Weight (kg)</Label>
+            <Input
+              type="number"
+              step="0.1"
+              value={profile.targetWeight}
+              onChange={(e) =>
+                setProfile({ targetWeight: parseFloat(e.target.value) })
+              }
+            />
           </div>
           <div>
-            <Label className="text-xs">Protein (g)</Label>
-            <Input type="number" value={profile.dailyProteinGoal} onChange={(e) => setProfile({ dailyProteinGoal: parseInt(e.target.value, 10) })} />
+            <Label className="text-xs">Protein (g/day)</Label>
+            <Input
+              type="number"
+              value={profile.dailyProteinGoal}
+              onChange={(e) =>
+                setProfile({ dailyProteinGoal: parseInt(e.target.value, 10) })
+              }
+            />
           </div>
           <div>
-            <Label className="text-xs">Water (ml)</Label>
-            <Input type="number" value={profile.dailyWaterGoal} onChange={(e) => setProfile({ dailyWaterGoal: parseInt(e.target.value, 10) })} />
+            <Label className="text-xs">Water (ml/day)</Label>
+            <Input
+              type="number"
+              value={profile.dailyWaterGoal}
+              onChange={(e) =>
+                setProfile({ dailyWaterGoal: parseInt(e.target.value, 10) })
+              }
+            />
           </div>
           <div>
             <Label className="text-xs">Sleep (h)</Label>
-            <Input type="number" value={profile.dailySleepGoal} onChange={(e) => setProfile({ dailySleepGoal: parseFloat(e.target.value) })} />
+            <Input
+              type="number"
+              step="0.5"
+              value={profile.dailySleepGoal}
+              onChange={(e) =>
+                setProfile({ dailySleepGoal: parseFloat(e.target.value) })
+              }
+            />
           </div>
           <div>
             <Label className="text-xs">Steps</Label>
-            <Input type="number" value={profile.dailyStepsGoal} onChange={(e) => setProfile({ dailyStepsGoal: parseInt(e.target.value, 10) })} />
+            <Input
+              type="number"
+              value={profile.dailyStepsGoal}
+              onChange={(e) =>
+                setProfile({ dailyStepsGoal: parseInt(e.target.value, 10) })
+              }
+            />
           </div>
-        </div>
-      </GlassCard>
-
-      <GlassCard className="space-y-3">
-        <h2 className="font-semibold">Goals</h2>
-        {goals.map((g) => (
-          <div key={g.id} className="flex items-center justify-between text-sm">
-            <span>{g.title}</span>
-            <Button size="sm" variant="ghost" onClick={() => removeGoal(g.id)}>Remove</Button>
-          </div>
-        ))}
-        <div className="flex gap-2">
-          <Input placeholder="New goal..." value={newGoalTitle} onChange={(e) => setNewGoalTitle(e.target.value)} />
-          <Button size="sm" onClick={() => {
-            if (!newGoalTitle) return;
-            addGoal({ id: generateId(), title: newGoalTitle, category: "Custom", current: 0, target: 100, unit: "%", active: true });
-            setNewGoalTitle("");
-          }}>Add</Button>
-        </div>
-      </GlassCard>
-
-      <GlassCard className="space-y-3">
-        <h2 className="font-semibold">Habits</h2>
-        {habits.filter(h => h.active).map((h) => (
-          <div key={h.id} className="flex items-center justify-between text-sm">
-            <span>{h.title} <span className="text-muted-foreground">({h.category})</span></span>
-            <Button size="sm" variant="ghost" onClick={() => removeHabit(h.id)}>Remove</Button>
-          </div>
-        ))}
-        <div className="flex gap-2">
-          <Input placeholder="New habit..." value={newHabitTitle} onChange={(e) => setNewHabitTitle(e.target.value)} />
-          <Button size="sm" onClick={() => {
-            if (!newHabitTitle) return;
-            addHabit({ id: generateId(), title: newHabitTitle, category: "Custom", frequency: "daily", active: true });
-            setNewHabitTitle("");
-          }}>Add</Button>
         </div>
       </GlassCard>
 
       <GlassCard className="space-y-3">
         <div className="flex items-center justify-between">
           <h2 className="font-semibold">Water Reminders</h2>
-          <Switch checked={notifEnabled} onCheckedChange={(v) => {
-            setNotifEnabled(v);
-            syncRemindersToSW();
-          }} />
+          <Switch
+            checked={notifEnabled}
+            onCheckedChange={(v) => {
+              setNotifEnabled(v);
+              syncRemindersToSW();
+            }}
+          />
         </div>
-        <Button size="sm" variant="secondary" onClick={() => requestNotificationPermission()}>
+        <Button
+          size="sm"
+          variant="secondary"
+          onClick={() => requestNotificationPermission()}
+        >
           Enable Notifications
         </Button>
         {reminders.map((r) => (
@@ -156,45 +184,73 @@ export function SettingsContent() {
                 syncRemindersToSW();
               }}
             />
-            <Button size="icon" variant="ghost" onClick={() => {
-              removeReminder(r.id);
-              syncRemindersToSW();
-            }}>
+            <Button
+              size="icon"
+              variant="ghost"
+              onClick={() => {
+                removeReminder(r.id);
+                syncRemindersToSW();
+              }}
+            >
               ×
             </Button>
           </div>
         ))}
-        <Button size="sm" variant="secondary" onClick={() => {
-          addReminder("12:00");
-          syncRemindersToSW();
-        }}>
+        <Button
+          size="sm"
+          variant="outline"
+          onClick={() => {
+            addReminder("12:00");
+            syncRemindersToSW();
+          }}
+        >
           Add Reminder
         </Button>
       </GlassCard>
 
-      <div>
-        <h2 className="mb-3 font-semibold">Workout Plan</h2>
-        <WorkoutEditor />
-      </div>
-
-      <div>
-        <h2 className="mb-3 font-semibold">Weekly Review History</h2>
-        <ReviewHistory />
-      </div>
-
       <GlassCard className="space-y-3">
-        <h2 className="font-semibold">Backup</h2>
+        <h2 className="font-semibold">Backup & Restore</h2>
+        <p className="text-xs text-muted-foreground">
+          All data stays on this device. Export regularly for safety.
+        </p>
         <Button className="w-full" variant="secondary" onClick={() => exportDataBackup()}>
           Export Data (forge-backup.json)
         </Button>
         <Button className="w-full" variant="secondary" onClick={() => exportFullBackup()}>
-          Export Full (forge-backup-full.json)
+          Export Full (+ photos)
         </Button>
-        <input ref={fileRef} type="file" accept=".json" className="hidden" onChange={handleImport} />
+        <input
+          ref={fileRef}
+          type="file"
+          accept=".json"
+          className="hidden"
+          onChange={handleFileSelect}
+        />
         <Button className="w-full" variant="outline" onClick={() => fileRef.current?.click()}>
           Import Backup
         </Button>
+        <Button className="w-full" variant="ghost" onClick={reseed}>
+          Re-seed from Blueprint defaults
+        </Button>
       </GlassCard>
+
+      <Dialog open={importOpen} onOpenChange={setImportOpen}>
+        <DialogContent className="max-w-sm rounded-2xl">
+          <DialogHeader>
+            <DialogTitle>Import backup?</DialogTitle>
+            <DialogDescription>
+              This replaces all local Forge data with{" "}
+              <strong>{pendingFile?.name}</strong>. Export first if unsure.
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter className="gap-2 sm:gap-0">
+            <Button variant="outline" onClick={() => setImportOpen(false)}>
+              Cancel
+            </Button>
+            <Button onClick={confirmImport}>Import</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

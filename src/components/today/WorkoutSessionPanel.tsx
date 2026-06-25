@@ -1,5 +1,6 @@
 "use client";
 
+import { useMemo } from "react";
 import { useWorkoutStore } from "@/stores/workoutStore";
 import { useProgressStore } from "@/stores/progressStore";
 import { updateTodayRecord } from "@/lib/sync-day";
@@ -19,12 +20,17 @@ const LIFT_MAP: Record<string, StrengthLog["exercise"]> = {
 
 export function WorkoutSessionPanel() {
   const date = todayKey();
-  const nextDay = useWorkoutStore(
-    (s) => s.plan.days[s.cycle.currentIndex] ?? null
-  );
-  const session = useWorkoutStore((s) => s.sessions[date]);
+  const plan = useWorkoutStore((s) => s.plan);
+  const currentIndex = useWorkoutStore((s) => s.cycle.currentIndex);
+  const sessions = useWorkoutStore((s) => s.sessions);
   const updateSession = useWorkoutStore((s) => s.updateSession);
   const completeWorkout = useWorkoutStore((s) => s.completeWorkout);
+
+  const nextDay = useMemo(
+    () => plan.days[currentIndex] ?? null,
+    [plan, currentIndex]
+  );
+  const session = sessions[date];
 
   if (!nextDay) {
     return (

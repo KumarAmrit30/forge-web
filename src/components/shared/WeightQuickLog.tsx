@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import {
   Dialog,
   DialogContent,
@@ -19,11 +19,14 @@ type Props = {
 };
 
 export function WeightQuickLog({ open, onOpenChange }: Props) {
-  const latestWeight = useProgressStore((s) => {
-    const logs = s.weightLogs;
-    return logs.length ? logs[logs.length - 1].weightKg : null;
-  });
+  const weightLogs = useProgressStore((s) => s.weightLogs);
   const profile = useSettingsStore((s) => s.profile);
+
+  const latestWeight = useMemo(() => {
+    if (!weightLogs.length) return null;
+    return weightLogs[weightLogs.length - 1].weightKg;
+  }, [weightLogs]);
+
   const [value, setValue] = useState(
     latestWeight?.toString() ?? profile.currentWeight.toString()
   );

@@ -10,6 +10,7 @@ import {
 import { Textarea } from "@/components/ui/textarea";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
+import { Prose } from "@/components/shared/Prose";
 import { LIFE_AREAS } from "@/types";
 
 const SECTIONS = [
@@ -36,10 +37,14 @@ export function BlueprintContent() {
       <header className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-bold tracking-tight">Blueprint</h1>
-          <p className="text-sm text-muted-foreground">Your transformation system</p>
+          <p className="text-sm text-muted-foreground">
+            Your operating manual — routines, goals, and systems.
+          </p>
         </div>
         <div className="flex items-center gap-2">
-          <Label htmlFor="edit-mode" className="text-xs">Edit</Label>
+          <Label htmlFor="edit-mode" className="text-xs">
+            Edit
+          </Label>
           <Switch id="edit-mode" checked={editMode} onCheckedChange={setEditMode} />
         </div>
       </header>
@@ -52,12 +57,10 @@ export function BlueprintContent() {
               <Textarea
                 value={store.goals}
                 onChange={(e) => setSection("goals", e.target.value)}
-                rows={6}
+                rows={8}
               />
             ) : (
-              <pre className="whitespace-pre-wrap text-sm leading-relaxed text-muted-foreground">
-                {store.goals}
-              </pre>
+              <Prose content={store.goals} />
             )}
           </AccordionContent>
         </AccordionItem>
@@ -75,9 +78,7 @@ export function BlueprintContent() {
                     rows={2}
                   />
                 ) : (
-                  <p className="text-sm text-muted-foreground">
-                    {store.lifeAreas[area] || "—"}
-                  </p>
+                  <Prose content={store.lifeAreas[area] ?? ""} />
                 )}
               </div>
             ))}
@@ -85,19 +86,21 @@ export function BlueprintContent() {
         </AccordionItem>
 
         {SECTIONS.filter((s) => s.key !== "goals").map(({ key, label }) => (
-          <AccordionItem key={key} value={key} className="rounded-2xl border border-border/50 px-4">
+          <AccordionItem
+            key={key}
+            value={key}
+            className="rounded-2xl border border-border/50 px-4"
+          >
             <AccordionTrigger>{label}</AccordionTrigger>
             <AccordionContent>
               {editMode ? (
                 <Textarea
                   value={store[key]}
                   onChange={(e) => setSection(key, e.target.value)}
-                  rows={6}
+                  rows={8}
                 />
               ) : (
-                <pre className="whitespace-pre-wrap text-sm leading-relaxed text-muted-foreground">
-                  {store[key]}
-                </pre>
+                <Prose content={store[key]} />
               )}
             </AccordionContent>
           </AccordionItem>

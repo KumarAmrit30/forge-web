@@ -1,12 +1,17 @@
 "use client";
 
+import { useMemo } from "react";
 import { useWorkoutStore } from "@/stores/workoutStore";
 import { GlassCard } from "@/components/shared/GlassCard";
 import { Dumbbell } from "lucide-react";
 
 export function NextWorkoutCard() {
-  const nextDay = useWorkoutStore(
-    (s) => s.plan.days[s.cycle.currentIndex] ?? null
+  const plan = useWorkoutStore((s) => s.plan);
+  const currentIndex = useWorkoutStore((s) => s.cycle.currentIndex);
+
+  const nextDay = useMemo(
+    () => plan.days[currentIndex] ?? null,
+    [plan, currentIndex]
   );
 
   if (!nextDay) return null;

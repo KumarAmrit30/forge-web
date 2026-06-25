@@ -3,29 +3,24 @@ import { useWaterStore } from "@/stores/waterStore";
 import { useWorkoutStore } from "@/stores/workoutStore";
 import { useSettingsStore } from "@/stores/settingsStore";
 import { calculateScore } from "@/lib/scoring";
+import { syncGoalsFromDayRecord } from "@/lib/goals-sync";
+import { refreshWaterStreaks } from "@/lib/streaks";
+import {
+  getMorningRoutineItems,
+  getNightRoutineItems,
+} from "@/lib/routines";
 import type { DayRecord } from "@/types";
 import { todayKey } from "@/lib/date-utils";
 
-const DEFAULT_MORNING = [
-  "Face Wash",
-  "Moisturizer",
-  "Sunscreen",
-  "Breakfast",
-];
+export function buildDefaultDayRecord(date: string): DayRecord {
+  const morningItems = getMorningRoutineItems();
+  const nightItems = getNightRoutineItems();
 
-const DEFAULT_NIGHT = [
-  "Face Wash",
-  "Moisturizer",
-  "Apply Minoxidil",
-  "Sleep Goal",
-];
-
-export function getDefaultDayRecord(date: string): DayRecord {
   const morningChecklist: Record<string, boolean> = {};
-  DEFAULT_MORNING.forEach((k) => (morningChecklist[k] = false));
+  morningItems.forEach((k) => (morningChecklist[k] = false));
 
   const nightChecklist: Record<string, boolean> = {};
-  DEFAULT_NIGHT.forEach((k) => (nightChecklist[k] = false));
+  nightItems.forEach((k) => (nightChecklist[k] = false));
 
   return {
     date,
@@ -35,11 +30,7 @@ export function getDefaultDayRecord(date: string): DayRecord {
     sleepHours: 0,
     steps: 0,
     morningChecklist,
-    dayChecklist: {
-      "Protein Goal": false,
-      "Water Goal": false,
-      "Step Goal": false,
-    },
+    dayChecklist: {},
     nightChecklist,
     habits: {},
     notes: "",
@@ -49,8 +40,26 @@ export function getDefaultDayRecord(date: string): DayRecord {
 export function getOrCreateTodayRecord(): DayRecord {
   const date = todayKey();
   const existing = useCalendarStore.getState().getDay(date);
-  if (existing) return { ...existing };
-  return getDefaultDayRecord(date);
+  if (existing) {
+    return reconcileRoutineChecklists(existing);
+  }
+  return buildDefaultDayRecord(date);
+}
+
+function reconcileRoutineChecklists(record: DayRecord): DayRecord {
+  const morning = getMorningRoutineItems();
+  const night = getNightRoutineItems();
+  const morningChecklist: Record<string, boolean> = {};
+  const nightChecklist: Record<string, boolean> = {};
+
+  for (const item of morning) {
+    morningChecklist[item] = record.morningChecklist[item] ?? false;
+  }
+  for (const item of night) {
+    nightChecklist[item] = record.nightChecklist[item] ?? false;
+  }
+
+  return { ...record, morningChecklist, nightChecklist };
 }
 
 export function updateTodayRecord(updates: Partial<DayRecord>): DayRecord {
@@ -75,6 +84,8 @@ export function updateTodayRecord(updates: Partial<DayRecord>): DayRecord {
 
   useCalendarStore.getState().upsertDay(merged);
   useSettingsStore.getState().updateStreak(date);
+  syncGoalsFromDayRecord(merged);
+  refreshWaterStreaks();
 
   return merged;
 }

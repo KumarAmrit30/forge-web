@@ -1,5 +1,8 @@
 "use client";
 
+import { useMemo } from "react";
+import { useCalendarStore } from "@/stores/calendarStore";
+import { useProgressStore } from "@/stores/progressStore";
 import { generateInsights } from "@/lib/insights";
 import { GlassCard } from "@/components/shared/GlassCard";
 import { Sparkles } from "lucide-react";
@@ -10,7 +13,13 @@ type Props = {
 };
 
 export function WeeklySummary({ onOpenReview }: Props) {
-  const insights = generateInsights();
+  const calendarDays = useCalendarStore((s) => s.days);
+  const weightLogs = useProgressStore((s) => s.weightLogs);
+
+  const insights = useMemo(
+    () => generateInsights(),
+    [calendarDays, weightLogs]
+  );
 
   return (
     <GlassCard className="space-y-3">

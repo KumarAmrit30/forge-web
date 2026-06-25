@@ -9,8 +9,11 @@ type SettingsState = {
   profile: Profile;
   streak: number;
   lastActiveDate: string | null;
+  morningRoutineItems: string[];
+  nightRoutineItems: string[];
   setProfile: (profile: Partial<Profile>) => void;
   setHasSeeded: (v: boolean) => void;
+  setRoutineItems: (morning: string[], night: string[]) => void;
   updateStreak: (date: string) => void;
 };
 
@@ -36,9 +39,13 @@ export const useSettingsStore = create<SettingsState>()(
       profile: defaultProfile,
       streak: 0,
       lastActiveDate: null,
+      morningRoutineItems: [],
+      nightRoutineItems: [],
       setProfile: (profile) =>
         set({ profile: { ...get().profile, ...profile } }),
       setHasSeeded: (v) => set({ hasSeeded: v }),
+      setRoutineItems: (morning, night) =>
+        set({ morningRoutineItems: morning, nightRoutineItems: night }),
       updateStreak: (date) => {
         const { lastActiveDate, streak } = get();
         if (lastActiveDate === date) return;
@@ -63,6 +70,8 @@ export function getSettingsSnapshot() {
     profile: s.profile,
     streak: s.streak,
     lastActiveDate: s.lastActiveDate,
+    morningRoutineItems: s.morningRoutineItems,
+    nightRoutineItems: s.nightRoutineItems,
   };
 }
 

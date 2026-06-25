@@ -14,6 +14,7 @@ import { Button } from "@/components/ui/button";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { format } from "date-fns";
+import { buildDefaultDayRecord } from "@/lib/sync-day";
 import type { DayRecord } from "@/types";
 
 const DOT_COLORS = {
@@ -42,7 +43,14 @@ function DaySummary({ record }: { record: DayRecord }) {
       <p>Steps: {record.steps.toLocaleString()}</p>
       {record.weightKg && <p>Weight: {record.weightKg} kg</p>}
       {record.workoutCompletion?.completed && (
-        <p>Workout: Completed</p>
+        <p>Workout: Completed ✓</p>
+      )}
+      {Object.keys(record.habits).length > 0 && (
+        <p>
+          Habits:{" "}
+          {Object.values(record.habits).filter(Boolean).length}/
+          {Object.keys(record.habits).length}
+        </p>
       )}
       {record.notes && <p className="text-muted-foreground">{record.notes}</p>}
     </div>
@@ -97,14 +105,22 @@ export function CalendarView() {
             return (
               <button
                 key={key}
-                onClick={() => record && setSelected(record)}
+                onClick={() =>
+                  setSelected(record ?? buildDefaultDayRecord(key))
+                }
                 className={cn(
                   "flex flex-col items-center rounded-lg py-2 text-sm transition-colors hover:bg-secondary/50",
-                  isToday && "ring-1 ring-emerald-500/50"
+                  isToday && "ring-1 ring-emerald-500/50",
+                  !record && "opacity-60"
                 )}
               >
                 <span>{date.getDate()}</span>
-                <div className={cn("mt-1 h-1.5 w-1.5 rounded-full", DOT_COLORS[level])} />
+                <div
+                  className={cn(
+                    "mt-1 h-1.5 w-1.5 rounded-full",
+                    DOT_COLORS[level]
+                  )}
+                />
               </button>
             );
           })}

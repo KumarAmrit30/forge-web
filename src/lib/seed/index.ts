@@ -164,5 +164,32 @@ export function runSeed(): void {
     }))
   );
 
+  const morningRoutine = [
+    ...skinRoutine.morning,
+    ...hairRoutine.products
+      .filter((p) => p.timing === "Morning")
+      .map((p) => p.name),
+    "Breakfast",
+  ];
+
+  const nightRoutine = [
+    ...skinRoutine.night,
+    ...hairRoutine.products
+      .filter((p) => p.timing === "Night")
+      .map((p) => p.name),
+    "Sleep Goal",
+  ];
+
+  useSettingsStore.getState().setRoutineItems(morningRoutine, nightRoutine);
+
+  bp.setSection("dietPlan", formatSection("Diet Plan", [
+    `Calories: ${nutrition.calories}`,
+    `Protein: ${nutrition.protein}g`,
+    `Carbs: ${nutrition.carbs}g`,
+    `Fats: ${nutrition.fats}g`,
+    `Fiber: ${nutrition.fiber}g`,
+    `Water: ${nutrition.water}ml daily`,
+  ]));
+
   useSettingsStore.getState().setHasSeeded(true);
 }

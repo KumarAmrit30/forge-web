@@ -15,6 +15,7 @@ import { useProgressStore } from "@/stores/progressStore";
 import { useCalendarStore } from "@/stores/calendarStore";
 import { useSettingsStore } from "@/stores/settingsStore";
 import { generateInsights } from "@/lib/insights";
+import { PhotoGallery, PhotoCompare } from "@/components/progress/PhotoGallery";
 import { GlassCard } from "@/components/shared/GlassCard";
 import { CheckpointTimeline } from "@/components/checkpoint/CheckpointTimeline";
 import { MonthlyCheckpointSheet } from "@/components/checkpoint/MonthlyCheckpointSheet";
@@ -138,6 +139,9 @@ export function ProgressContent() {
           ))}
         </div>
       </GlassCard>
+
+      <PhotoCompare />
+      <PhotoGallery />
 
       <div>
         <h2 className="mb-3 font-semibold">Monthly Checkpoints</h2>
