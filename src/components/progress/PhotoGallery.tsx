@@ -75,15 +75,17 @@ export function PhotoGallery() {
 
 export function PhotoCompare() {
   const checkpoints = useCheckpointStore((s) => s.checkpoints);
-  const sorted = [...checkpoints].sort((a, b) => a.month.localeCompare(b.month));
   const [beforeUrl, setBeforeUrl] = useState<string | null>(null);
   const [afterUrl, setAfterUrl] = useState<string | null>(null);
 
   useEffect(() => {
     async function load() {
-      if (sorted.length < 2) return;
-      const first = sorted[0].month;
-      const last = sorted[sorted.length - 1].month;
+      const ordered = [...checkpoints].sort((a, b) =>
+        a.month.localeCompare(b.month)
+      );
+      if (ordered.length < 2) return;
+      const first = ordered[0].month;
+      const last = ordered[ordered.length - 1].month;
       const before = await getPhoto(photoKey("hair", first, "front"));
       const after = await getPhoto(photoKey("hair", last, "front"));
       if (before) setBeforeUrl(URL.createObjectURL(before));

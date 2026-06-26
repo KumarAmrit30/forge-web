@@ -1,5 +1,5 @@
-import { TodayPageContent } from "@/components/today/TodayPageContent";
+import { TodayScreen } from "@/components/today/TodayScreen";
 
 export default function TodayPage() {
-  return <TodayPageContent />;
+  return <TodayScreen />;
 }

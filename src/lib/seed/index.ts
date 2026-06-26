@@ -2,7 +2,6 @@ import { seedData } from "./data";
 import { generateId } from "@/lib/id";
 import { useSettingsStore } from "@/stores/settingsStore";
 import { useGoalStore } from "@/stores/goalStore";
-import { useWaterStore } from "@/stores/waterStore";
 import {
   useWorkoutStore,
   createExerciseFromSeed,

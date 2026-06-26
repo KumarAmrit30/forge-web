@@ -1,16 +1,27 @@
 import { format, subDays } from "date-fns";
 import { assetPublicPath } from "@/lib/asset-catalog";
 import { todayKey } from "@/lib/date-utils";
+import {
+  annotateJourneyStatus,
+  buildDailyJourney,
+  countCompletedSteps,
+  estimateWorkoutDurationMinutes,
+  getCurrentJourneyStep,
+  getNextJourneyStep,
+  HOME_JOURNEY_STEP_IDS,
+  TODAY_JOURNEY_STEP_IDS,
+  shortWorkoutTitle,
+  type DailyJourneyStep,
+  type JourneyInput,
+  type JourneyStepId,
+  type JourneyStepWithStatus,
+} from "@/lib/journey-data";
 import { buildDefaultDayRecord } from "@/lib/sync-day";
 import type { DayRecord, WorkoutDay } from "@/types";
 
 export type TimeOfDay = "morning" | "afternoon" | "evening" | "night";
 
-export type JourneyMoment = {
-  id: "morning" | "workout" | "hydration" | "evening";
-  label: string;
-  complete: boolean;
-};
+export type JourneyMoment = DailyJourneyStep;
 
 export type HomeMission = {
   title: string;
@@ -50,12 +61,6 @@ export function formatHomeDate(date = new Date()): string {
   return format(date, "EEEE • MMMM d");
 }
 
-function isChecklistComplete(checklist: Record<string, boolean>): boolean {
-  const keys = Object.keys(checklist);
-  if (!keys.length) return false;
-  return keys.every((key) => checklist[key]);
-}
-
 export function resolveTodayRecord(
   calendarDays: Record<string, DayRecord>
 ): DayRecord {
@@ -63,69 +68,33 @@ export function resolveTodayRecord(
   return calendarDays[date] ?? buildDefaultDayRecord(date);
 }
 
+export function buildJourneyInput(
+  record: DayRecord,
+  profile: JourneyInput["profile"],
+  nextDay: WorkoutDay | null,
+  isRestDay: boolean,
+  waterMl?: number
+): JourneyInput {
+  return {
+    record,
+    profile,
+    nextDay,
+    isRestDay,
+    waterMl: waterMl ?? record.waterMl,
+  };
+}
+
 export function buildJourneyMoments(
   record: DayRecord,
-  waterGoalMl: number,
+  profile: JourneyInput["profile"],
   isRestDay: boolean,
-  nextDay: WorkoutDay | null
+  nextDay: WorkoutDay | null,
+  waterMl?: number
 ): JourneyMoment[] {
-  const workoutComplete =
-    isRestDay || Boolean(record.workoutCompletion?.completed);
-
-  const workoutLabel =
-    isRestDay || !nextDay
-      ? "Recovery"
-      : shortWorkoutTitle(nextDay.name);
-
-  return [
-    {
-      id: "morning",
-      label: "Morning Routine",
-      complete: isChecklistComplete(record.morningChecklist),
-    },
-    {
-      id: "workout",
-      label: workoutLabel,
-      complete: workoutComplete,
-    },
-    {
-      id: "hydration",
-      label: formatWaterGoalLabel(waterGoalMl),
-      complete: record.waterMl >= waterGoalMl,
-    },
-    {
-      id: "evening",
-      label: "Evening Reflection",
-      complete: isChecklistComplete(record.nightChecklist),
-    },
-  ];
-}
-
-function formatWaterGoalLabel(ml: number): string {
-  if (ml >= 1000) {
-    const liters = ml / 1000;
-    const formatted =
-      liters % 1 === 0
-        ? `${liters}L`
-        : `${liters.toFixed(1).replace(/\.0$/, "")}L`;
-    return `${formatted} Water`;
-  }
-  return `${ml}ml Water`;
-}
-
-function shortWorkoutTitle(name: string): string {
-  return name.replace(/\s*\([^)]*\)\s*$/, "").trim();
-}
-
-function estimateDurationMinutes(
-  exerciseCount: number,
-  isRestDay: boolean
-): string {
-  if (isRestDay) return "30 min";
-  if (!exerciseCount) return "45 min";
-  const minutes = Math.min(75, Math.max(35, exerciseCount * 5 + 10));
-  const rounded = Math.round(minutes / 5) * 5;
-  return `${rounded} min`;
+  return buildDailyJourney(
+    buildJourneyInput(record, profile, nextDay, isRestDay, waterMl),
+    HOME_JOURNEY_STEP_IDS
+  );
 }
 
 export function buildMission(
@@ -146,7 +115,7 @@ export function buildMission(
   return {
     title: shortWorkoutTitle(nextDay.name),
     subtitle: "",
-    duration: estimateDurationMinutes(nextDay.exercises.length, false),
+    duration: `${estimateWorkoutDurationMinutes(nextDay.exercises.length, false)} min`,
     illustration: assetPublicPath("wellness/workout.svg"),
     href: "/today#workout",
     isRestDay: false,
@@ -156,10 +125,7 @@ export function buildMission(
 export function buildForgeBrief(time: TimeOfDay): [string, string] {
   switch (time) {
     case "morning":
-      return [
-        "Yesterday's discipline becomes today's momentum.",
-        "",
-      ];
+      return ["Yesterday's discipline becomes today's momentum.", ""];
     case "afternoon":
       return [
         "Half the day remains.",
@@ -200,3 +166,18 @@ export function buildForgeInsight(
 export function yesterdayKey(): string {
   return format(subDays(new Date(), 1), "yyyy-MM-dd");
 }
+
+export type {
+  DailyJourneyStep,
+  JourneyStepId,
+  JourneyStepWithStatus,
+};
+
+export {
+  annotateJourneyStatus,
+  buildDailyJourney,
+  countCompletedSteps,
+  getCurrentJourneyStep,
+  getNextJourneyStep,
+  TODAY_JOURNEY_STEP_IDS,
+};

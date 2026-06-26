@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import {
   Dialog,
   DialogContent,
@@ -15,14 +15,10 @@ import Link from "next/link";
 const ONBOARDING_KEY = "forge-onboarding-seen";
 
 export function OnboardingDialog() {
-  const [open, setOpen] = useState(false);
-
-  useEffect(() => {
-    if (typeof window === "undefined") return;
-    if (!localStorage.getItem(ONBOARDING_KEY)) {
-      setOpen(true);
-    }
-  }, []);
+  const [open, setOpen] = useState(() => {
+    if (typeof window === "undefined") return false;
+    return !localStorage.getItem(ONBOARDING_KEY);
+  });
 
   const dismiss = () => {
     localStorage.setItem(ONBOARDING_KEY, "1");

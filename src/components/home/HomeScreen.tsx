@@ -57,11 +57,12 @@ export function HomeScreen() {
     () =>
       buildJourneyMoments(
         todayRecord,
-        profile.dailyWaterGoal,
+        profile,
         isRestDay,
-        nextDay
+        nextDay,
+        todayRecord.waterMl
       ),
-    [todayRecord, profile.dailyWaterGoal, isRestDay, nextDay]
+    [todayRecord, profile, isRestDay, nextDay]
   );
 
   const insight = useMemo(
