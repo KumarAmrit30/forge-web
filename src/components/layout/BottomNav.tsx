@@ -4,7 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { motion } from "framer-motion";
 import {
-  LayoutDashboard,
+  Home,
   CheckCircle2,
   Calendar,
   TrendingUp,
@@ -14,7 +14,7 @@ import {
 import { cn } from "@/lib/utils";
 
 const tabs = [
-  { href: "/", label: "Dashboard", icon: LayoutDashboard },
+  { href: "/", label: "Home", icon: Home },
   { href: "/today", label: "Today", icon: CheckCircle2 },
   { href: "/calendar", label: "Calendar", icon: Calendar },
   { href: "/progress", label: "Progress", icon: TrendingUp },
@@ -38,20 +38,28 @@ export function BottomNav() {
               key={href}
               href={href}
               className={cn(
-                "relative flex flex-col items-center gap-0.5 px-2 py-1.5 text-[10px] transition-colors",
+                "relative flex flex-col items-center gap-1 px-2 py-1.5 text-[10px] transition-colors duration-300 ease-out",
                 active
-                  ? "text-foreground"
+                  ? "text-primary"
                   : "text-muted-foreground hover:text-foreground/70"
               )}
             >
               {active && (
                 <motion.div
                   layoutId="nav-indicator"
-                  className="absolute -top-2 h-0.5 w-8 rounded-full bg-emerald-500"
-                  transition={{ type: "spring", stiffness: 400, damping: 30 }}
+                  className="absolute -top-2 h-0.5 w-8 rounded-full bg-primary"
+                  transition={{ duration: 0.3, ease: [0, 0, 0.2, 1] }}
                 />
               )}
-              <Icon className="h-5 w-5" strokeWidth={active ? 2.2 : 1.8} />
+              <Icon
+                className={cn(
+                  "transition-[filter,transform] duration-300 ease-out",
+                  active
+                    ? "h-[22px] w-[22px] drop-shadow-[0_0_8px_oklch(0.72_0.15_160/0.45)]"
+                    : "h-5 w-5"
+                )}
+                strokeWidth={active ? 2.2 : 1.8}
+              />
               <span className="font-medium">{label}</span>
             </Link>
           );
