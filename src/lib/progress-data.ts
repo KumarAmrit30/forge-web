@@ -17,7 +17,7 @@ import {
   workoutCompleted,
   type IdentityDayRecord,
   type MilestoneIconId,
-} from "@/lib/identity-engine";
+} from "@/lib/brain";
 import type { DayRecord, Profile, WorkoutSession } from "@/types";
 
 export type ProgressInput = {

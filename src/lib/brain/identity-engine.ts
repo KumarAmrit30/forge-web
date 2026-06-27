@@ -2,11 +2,10 @@ import { format, parseISO } from "date-fns";
 import { assetPublicPath } from "@/lib/asset-catalog";
 import { calculateScore } from "@/lib/scoring";
 import { formatLiters, isChecklistComplete } from "@/lib/journey-data";
-import type { DayRecord, Profile, WorkoutSession } from "@/types";
+import type { GrowthStage, IdentityLevel, IdentityProfile, ForgeContext, IdentityDayRecord } from "@/lib/brain/types";
+import type { Profile, WorkoutSession } from "@/types";
 
 const GOOD_DAY_SCORE = 80;
-
-export type IdentityDayRecord = DayRecord & { waterMl: number };
 
 export type IdentityContext = {
   allRecords: IdentityDayRecord[];
@@ -16,8 +15,6 @@ export type IdentityContext = {
   workoutSessions: Record<string, WorkoutSession>;
   streak: number;
 };
-
-export type GrowthStage = "early" | "forming" | "establishing" | "forged";
 
 export type IdentityResult = {
   title: string;
@@ -598,6 +595,48 @@ export function determineForgeInsight(ctx: IdentityContext): string {
   return "Forge is still reading your patterns. Consistency in logging makes the signal clearer.";
 }
 
+function growthStageToLevel(stage: GrowthStage): IdentityLevel {
+  switch (stage) {
+    case "early":
+      return "emerging";
+    case "forming":
+      return "developing";
+    case "establishing":
+      return "established";
+    case "forged":
+      return "forged";
+  }
+}
+
+export function buildIdentityProfile(ctx: IdentityContext): IdentityProfile {
+  const identity = determineIdentityTitle(ctx);
+  return {
+    title: identity.title,
+    illustration: identity.illustration,
+    stage: identity.stage,
+    level: growthStageToLevel(identity.stage),
+    heroReflection: determineHeroReflection(ctx, identity),
+    monthlyReflection: determineMonthlyReflection(ctx),
+    timelineEvents: determineTimelineEvents(ctx, identity.title),
+    habitEvolution: determineHabitEvolution(ctx),
+    milestones: determineMilestones(ctx),
+    forgeInsight: determineForgeInsight(ctx),
+  };
+}
+
+export function identityContextFromForgeContext(
+  context: ForgeContext
+): IdentityContext {
+  return {
+    allRecords: context.dayRecords,
+    monthRecords: context.monthRecords,
+    prevMonthRecords: context.prevMonthRecords,
+    profile: context.settings.profile,
+    workoutSessions: context.workout.sessions,
+    streak: context.settings.streak,
+  };
+}
+
 function analyzeMorningWorkoutPattern(
   days: IdentityDayRecord[],
   sessions: Record<string, WorkoutSession>
@@ -713,4 +752,5 @@ export {
   hydrationAvg,
   sleepAvg,
   isGoodDay,
+  type GrowthStage,
 };

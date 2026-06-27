@@ -13,7 +13,7 @@ import { motion } from "framer-motion";
 import { cn } from "@/lib/utils";
 import { easeOut } from "@/components/home/motion";
 import type { MilestoneModel } from "@/lib/progress-data";
-import type { MilestoneIconId } from "@/lib/identity-engine";
+import type { MilestoneIconId } from "@/lib/brain";
 
 type Props = {
   milestone: MilestoneModel;
