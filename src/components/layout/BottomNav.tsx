@@ -8,8 +8,7 @@ import {
   CheckCircle2,
   Calendar,
   TrendingUp,
-  BookOpen,
-  Settings,
+  Sparkles,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -18,8 +17,7 @@ const tabs = [
   { href: "/today", label: "Today", icon: CheckCircle2 },
   { href: "/calendar", label: "Calendar", icon: Calendar },
   { href: "/progress", label: "Progress", icon: TrendingUp },
-  { href: "/blueprint", label: "Blueprint", icon: BookOpen },
-  { href: "/settings", label: "Settings", icon: Settings },
+  { href: "/forge", label: "Forge", icon: Sparkles },
 ];
 
 export function BottomNav() {
