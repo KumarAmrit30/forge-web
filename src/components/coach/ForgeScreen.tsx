@@ -1,14 +1,20 @@
 "use client";
 
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { useSettingsStore } from "@/stores/settingsStore";
 import { useForgeConversation } from "@/lib/coach/conversation-manager";
 import { ForgeHero } from "@/components/coach/ForgeHero";
 import { ConversationStarters } from "@/components/coach/ConversationStarters";
 import { ChatWindow } from "@/components/coach/ChatWindow";
 import { CoachInput } from "@/components/coach/CoachInput";
+import { ExecutionConfirmationDialog } from "@/components/execution/ExecutionConfirmationDialog";
+import { ExecutionSuccessBanner } from "@/components/execution/ExecutionSuccessBanner";
+import { ExecutionTimeline } from "@/components/execution/ExecutionTimeline";
 import type { ConversationStarter } from "@/lib/coach/coach-types";
-import type { ExperienceActionCard } from "@/lib/coach/conversation-experience";
+import {
+  buildExecutionTimeline,
+  useExecutionFlow,
+} from "@/lib/execution-ui";
 
 export function ForgeScreen() {
   const profile = useSettingsStore((s) => s.profile);
@@ -20,8 +26,22 @@ export function ForgeScreen() {
     sendMessage,
     sendStarter,
     dismissAction,
+    appendAcknowledgement,
   } = useForgeConversation(profile.name);
   const [awaitingCustomAsk, setAwaitingCustomAsk] = useState(false);
+  const [timelineVersion, setTimelineVersion] = useState(0);
+
+  const timelineEntries = useMemo(
+    () => buildExecutionTimeline(),
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- timelineVersion forces refresh after execution
+    [timelineVersion]
+  );
+
+  const executionFlow = useExecutionFlow({
+    onConversationAcknowledge: appendAcknowledgement,
+    onTimelineRefresh: () => setTimelineVersion((v) => v + 1),
+    onExecutionComplete: dismissAction,
+  });
 
   const viewModel = state.viewModel;
 
@@ -36,13 +56,6 @@ export function ForgeScreen() {
   function handleSend(message: string) {
     setAwaitingCustomAsk(false);
     void sendMessage(message);
-  }
-
-  function handleFollowUp(
-    question: string,
-    capabilityId?: ExperienceActionCard["capabilityId"]
-  ) {
-    void sendMessage(question, { capabilityId });
   }
 
   if (!viewModel) {
@@ -76,16 +89,22 @@ export function ForgeScreen() {
           isThinking={state.isThinking}
           thinkingMessage={thinkingMessage}
           dismissedActionIds={state.dismissedActionIds}
-          onFollowUp={handleFollowUp}
+          conversationPlan={state.conversationPlan}
+          onFollowUp={(question, capabilityId) =>
+            void sendMessage(question, { capabilityId })
+          }
           onDismissAction={dismissAction}
-          disabled={state.isThinking}
+          onReviewIntent={executionFlow.beginReview}
+          disabled={state.isThinking || executionFlow.status === "executing"}
         />
+
+        <ExecutionTimeline entries={timelineEntries} />
 
         {(hasConversation || awaitingCustomAsk) && (
           <div className="mt-6">
             <CoachInput
               onSend={handleSend}
-              disabled={state.isThinking}
+              disabled={state.isThinking || executionFlow.status === "executing"}
               placeholder={
                 awaitingCustomAsk
                   ? "What would you like to ask Forge?"
@@ -95,6 +114,21 @@ export function ForgeScreen() {
           </div>
         )}
       </div>
+
+      <ExecutionConfirmationDialog
+        open={executionFlow.confirmOpen}
+        intent={executionFlow.pendingIntent}
+        status={executionFlow.status}
+        onConfirm={executionFlow.applyConfirmed}
+        onCancel={executionFlow.cancelReview}
+      />
+
+      <ExecutionSuccessBanner
+        visible={executionFlow.bannerVisible}
+        result={executionFlow.flowResult}
+        onUndo={executionFlow.undoLast}
+        onDismiss={executionFlow.dismissBanner}
+      />
     </div>
   );
 }

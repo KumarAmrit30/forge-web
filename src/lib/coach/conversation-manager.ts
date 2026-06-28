@@ -213,6 +213,13 @@ export function useForgeConversation(userName: string) {
     }));
   }, []);
 
+  const appendAcknowledgement = useCallback((content: string) => {
+    setState((current) => ({
+      ...current,
+      messages: [...current.messages, createAssistantMessage(content)],
+    }));
+  }, []);
+
   const hasConversation = state.messages.length > 0;
 
   return useMemo(
@@ -226,6 +233,7 @@ export function useForgeConversation(userName: string) {
       sendMessage,
       sendStarter,
       dismissAction,
+      appendAcknowledgement,
     }),
     [
       state,
@@ -234,6 +242,7 @@ export function useForgeConversation(userName: string) {
       sendMessage,
       sendStarter,
       dismissAction,
+      appendAcknowledgement,
     ]
   );
 }

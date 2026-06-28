@@ -1,31 +1,58 @@
 "use client";
 
+import { useMemo } from "react";
 import { AnimatePresence } from "framer-motion";
-import { CoachActionCard } from "@/components/coach/CoachActionCard";
 import { ConversationEnding } from "@/components/coach/ConversationEnding";
+import { ExecutionPreviewCard } from "@/components/execution/ExecutionPreviewCard";
 import { FollowUpChips } from "@/components/coach/FollowUpChips";
 import { MessageBubble } from "@/components/coach/MessageBubble";
 import { ThinkingIndicator } from "@/components/coach/ThinkingIndicator";
 import { HomeSectionLabel } from "@/components/home/home-ui";
 import type { ExperienceActionCard } from "@/lib/coach/conversation-experience";
 import type { CoachMessage } from "@/lib/coach/coach-types";
+import type { ConversationPlan } from "@/lib/conversation/conversation-types";
+import {
+  buildExecutionIntent,
+  toActionPriority,
+} from "@/lib/execution-ui";
+import type { ExecutionIntent } from "@/lib/execution-ui/intent-types";
 
 type Props = {
   messages: CoachMessage[];
   isThinking: boolean;
   thinkingMessage?: string | null;
   dismissedActionIds: string[];
+  conversationPlan: ConversationPlan | null;
   onFollowUp: (question: string, capabilityId?: ExperienceActionCard["capabilityId"]) => void;
+  onReviewIntent: (intent: ExecutionIntent) => void;
   onDismissAction: (actionId: string) => void;
   disabled?: boolean;
 };
+
+function resolveActionForCard(
+  cardId: string,
+  plan: ConversationPlan | null,
+  parsedActions: Array<{ id: string; label: string; actionType: string }>
+) {
+  const fromPlan = plan?.prioritizedActions.find((action) => action.id === cardId);
+  if (fromPlan) return fromPlan;
+
+  const parsed = parsedActions.find((action) => action.id === cardId);
+  if (parsed) {
+    return toActionPriority(parsed);
+  }
+
+  return null;
+}
 
 export function ChatWindow({
   messages,
   isThinking,
   thinkingMessage,
   dismissedActionIds,
+  conversationPlan,
   onFollowUp,
+  onReviewIntent,
   onDismissAction,
   disabled,
 }: Props) {
@@ -33,20 +60,41 @@ export function ChatWindow({
     .reverse()
     .find((message) => message.role === "assistant");
 
-  if (messages.length === 0 && !isThinking) {
-    return null;
-  }
+  const executionIntents = useMemo(() => {
+    if (!lastAssistant?.experience?.actionCards) return [];
 
-  const visibleActionCards =
-    lastAssistant?.experience?.actionCards.filter(
-      (card) => !dismissedActionIds.includes(card.id)
-    ) ?? [];
+    return lastAssistant.experience.actionCards
+      .filter((card) => !dismissedActionIds.includes(card.id))
+      .map((card) => {
+        const action = resolveActionForCard(
+          card.id,
+          conversationPlan,
+          lastAssistant.parsed?.actions ?? []
+        );
+        if (!action) return null;
+
+        return buildExecutionIntent({
+          action,
+          reason: card.reason,
+          messageId: lastAssistant.id,
+        });
+      })
+      .filter((intent): intent is ExecutionIntent => intent !== null);
+  }, [
+    lastAssistant,
+    conversationPlan,
+    dismissedActionIds,
+  ]);
 
   const followUpChips = lastAssistant?.experience?.followUpChips ?? [];
   const showEnding =
     !isThinking &&
     lastAssistant?.experience?.endingType === "quiet" &&
     lastAssistant.experience.endingMessage;
+
+  if (messages.length === 0 && !isThinking) {
+    return null;
+  }
 
   return (
     <section className="mt-10 space-y-5">
@@ -63,19 +111,14 @@ export function ChatWindow({
       </div>
 
       <AnimatePresence mode="popLayout">
-        {!isThinking && visibleActionCards.length > 0 && (
+        {!isThinking && executionIntents.length > 0 && (
           <div className="space-y-3 pt-1">
-            {visibleActionCards.map((card, index) => (
-              <CoachActionCard
-                key={card.id}
-                card={card}
+            {executionIntents.map((intent, index) => (
+              <ExecutionPreviewCard
+                key={intent.id}
+                intent={intent}
                 index={index}
-                onPrimary={(selected) =>
-                  onFollowUp(
-                    `Help me with: ${selected.title}`,
-                    selected.capabilityId
-                  )
-                }
+                onReview={onReviewIntent}
                 onDismiss={onDismissAction}
               />
             ))}
