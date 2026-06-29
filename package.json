@@ -8,7 +8,15 @@
     "start": "next start",
     "lint": "eslint",
     "test": "vitest run",
-    "test:watch": "vitest"
+    "test:watch": "vitest",
+    "evaluate": "tsx src/evaluation/runner/cli.ts",
+    "evaluate:brain": "tsx src/evaluation/runner/brain-cli.ts --report html",
+    "evaluate:personality": "tsx src/evaluation/runner/personality-cli.ts --report html",
+    "evaluate:hallucination": "tsx src/evaluation/runner/hallucination-cli.ts --report html",
+    "evaluate:execution": "tsx src/evaluation/runner/execution-cli.ts --report html",
+    "evaluate:regression": "tsx src/evaluation/runner/regression-cli.ts",
+    "evaluate:release": "tsx src/evaluation/runner/release-cli.ts",
+    "evaluate:coach": "tsx tests/coach/cli/evaluate-coach.ts"
   },
   "dependencies": {
     "@base-ui/react": "^1.6.0",
@@ -31,7 +39,9 @@
     "zustand": "^5.0.14"
   },
   "devDependencies": {
+    "@playwright/test": "^1.61.1",
     "@tailwindcss/postcss": "^4",
+    "@types/jsdom": "^28.0.3",
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
@@ -39,7 +49,9 @@
     "eslint": "^9",
     "eslint-config-next": "16.2.9",
     "jsdom": "^29.1.1",
+    "playwright": "^1.61.1",
     "tailwindcss": "^4",
+    "tsx": "^4.22.4",
     "typescript": "^5",
     "vitest": "^4.1.9"
   }

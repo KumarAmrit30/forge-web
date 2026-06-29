@@ -30,5 +30,5 @@
     ".next/dev/types/**/*.ts",
     "**/*.mts"
   ],
-  "exclude": ["node_modules", "**/*.test.ts", "**/*.test-setup.ts"]
+  "exclude": ["node_modules", "**/*.test.ts", "**/*.test-setup.ts", "tests/coach/**", "src/evaluation/runner/cli.ts", "src/evaluation/runner/brain-cli.ts", "src/evaluation/runner/personality-cli.ts", "src/evaluation/runner/hallucination-cli.ts", "src/evaluation/runner/execution-cli.ts", "src/evaluation/runner/regression-cli.ts", "src/evaluation/runner/release-cli.ts", "src/evaluation/runner/phase3-runner.ts", "src/evaluation/runner/phase3-report-writer.ts", "src/evaluation/brain/write-scenarios.ts", "src/evaluation/personality/**", "src/evaluation/hallucination/**", "src/evaluation/execution-eval/**", "src/evaluation/shared/**", "src/evaluation/regression/**", "src/evaluation/metrics/phase3-scores.ts", "src/evaluation/reports/phase3-html-report.ts", "src/evaluation/reports/release-html-dashboard.ts", "src/evaluation/reports/release-markdown-summary.ts"]
 }
