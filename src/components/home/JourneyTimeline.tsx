@@ -31,8 +31,8 @@ const LINE_LEFT = NODE / 2;
 
 export function JourneyTimeline({ moments }: Props) {
   return (
-    <section className="mt-8">
-      <HomeSectionLabel className="mb-6">Today&apos;s Journey</HomeSectionLabel>
+    <section className="forge-section-gap">
+      <HomeSectionLabel className="mb-4">Upcoming</HomeSectionLabel>
 
       <motion.ul
         variants={container}
@@ -50,7 +50,7 @@ export function JourneyTimeline({ moments }: Props) {
           <motion.li
             key={moment.id}
             variants={item}
-            className="relative flex items-center gap-4 pb-8 last:pb-0"
+            className="relative flex items-center gap-4 pb-5 last:pb-0"
           >
             {moment.complete ? (
               <span

@@ -9,6 +9,8 @@ import { MissionCard } from "@/components/home/MissionCard";
 import { JourneyTimeline } from "@/components/home/JourneyTimeline";
 import { ForgeInsight } from "@/components/home/ForgeInsight";
 import { ProgressSummary } from "@/components/home/ProgressSummary";
+import { QuickActions } from "@/components/home/QuickActions";
+import { PageShell } from "@/components/ui/page-shell";
 import {
   buildForgeBrief,
   buildForgeInsight,
@@ -73,17 +75,17 @@ export function HomeScreen() {
   const completed = moments.filter((m) => m.complete).length;
 
   return (
-    <div className="relative mx-auto w-full max-w-lg">
+    <PageShell className="overflow-hidden pb-2">
       <div
         aria-hidden
-        className="pointer-events-none absolute inset-x-0 top-0 h-80 bg-[radial-gradient(ellipse_70%_60%_at_85%_10%,oklch(0.72_0.15_160/0.06),transparent_70%)]"
+        className="pointer-events-none absolute inset-x-0 top-0 h-72 bg-[radial-gradient(ellipse_70%_60%_at_85%_10%,oklch(0.72_0.15_160/0.06),transparent_70%)]"
       />
       <div
         aria-hidden
-        className="pointer-events-none absolute inset-x-0 top-0 h-96 bg-[radial-gradient(ellipse_90%_50%_at_50%_-10%,oklch(0.72_0.15_160/0.03),transparent_60%)]"
+        className="pointer-events-none absolute inset-x-0 top-0 h-80 bg-[radial-gradient(ellipse_90%_50%_at_50%_-10%,oklch(0.72_0.15_160/0.03),transparent_60%)]"
       />
 
-      <div className="relative px-6 pt-6">
+      <div className="relative">
         <HeroSection
           greeting={greeting}
           name={firstName}
@@ -92,13 +94,14 @@ export function HomeScreen() {
           illustration={heroIllustration}
         />
 
-        <div className="-mt-4">
+        <div className="-mt-2 space-y-0">
           <MissionCard mission={mission} />
+          <ProgressSummary completed={completed} total={moments.length} />
           <JourneyTimeline moments={moments} />
           <ForgeInsight insight={insight} />
-          <ProgressSummary completed={completed} total={moments.length} />
+          <QuickActions />
         </div>
       </div>
-    </div>
+    </PageShell>
   );
 }

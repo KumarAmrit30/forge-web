@@ -15,10 +15,10 @@ export function ChecklistSection({ title, items, onToggle }: Props) {
   const entries = Object.entries(items);
 
   return (
-    <HomeSurfaceCard elevation="insight" className="px-5 py-4">
+    <HomeSurfaceCard elevation="insight" className="px-4 py-3 sm:px-5 sm:py-4">
       <h3 className="text-sm font-medium text-foreground/90">{title}</h3>
       <LayoutGroup>
-        <div className="mt-3 space-y-1">
+        <div className="mt-2 space-y-0.5">
           {entries.map(([key, done]) => (
             <motion.button
               key={key}
@@ -26,7 +26,7 @@ export function ChecklistSection({ title, items, onToggle }: Props) {
               type="button"
               onClick={() => onToggle(key)}
               transition={{ duration: 0.3, ease: [0, 0, 0.2, 1] }}
-              className="flex w-full items-center gap-3 rounded-xl px-2 py-2.5 text-left transition-colors hover:bg-white/[0.03]"
+              className="flex min-h-11 w-full items-center gap-3 rounded-xl px-2 py-2 text-left transition-colors hover:bg-white/[0.03] focus-ring"
             >
               <motion.span
                 layout

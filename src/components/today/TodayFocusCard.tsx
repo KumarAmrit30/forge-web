@@ -35,8 +35,8 @@ export function TodayFocusCard({ activity, onCta, onQuickAction }: Props) {
           className="pointer-events-none absolute -right-8 top-6 h-36 w-36 rounded-full bg-primary/[0.06] blur-[56px]"
         />
 
-        <HomeSurfaceCard elevation="mission" className="relative px-6 py-4">
-          <div className="flex flex-col gap-3">
+        <HomeSurfaceCard elevation="mission" className="relative px-5 py-4 sm:px-6">
+          <div className="flex flex-col gap-2.5">
             <motion.div
               animate={{ y: [0, -3, 0] }}
               transition={{
@@ -44,7 +44,7 @@ export function TodayFocusCard({ activity, onCta, onQuickAction }: Props) {
                 repeat: Infinity,
                 ease: "easeInOut",
               }}
-              className="relative mx-auto h-28 w-full max-w-[200px]"
+              className="relative mx-auto h-24 w-full max-w-[180px]"
             >
               <Image
                 src={activity.illustration}
@@ -114,7 +114,7 @@ export function TodayFocusCard({ activity, onCta, onQuickAction }: Props) {
                     onClick={() =>
                       action.amountMl && onQuickAction?.(action.amountMl)
                     }
-                    className="rounded-full border border-primary/25 bg-primary/8 px-3.5 py-1 text-xs font-medium text-primary transition-all hover:bg-primary/12 active:scale-95"
+                    className="min-h-11 rounded-full border border-primary/25 bg-primary/8 px-4 py-2 text-xs font-medium text-primary transition-all hover:bg-primary/12 active:scale-95 focus-ring"
                   >
                     {action.label}
                   </button>
@@ -125,7 +125,7 @@ export function TodayFocusCard({ activity, onCta, onQuickAction }: Props) {
             <button
               type="button"
               onClick={onCta}
-              className="mx-auto mt-3 w-full max-w-xs rounded-full bg-primary px-6 py-2 text-sm font-semibold text-primary-foreground shadow-[0_0_16px_-6px_oklch(0.72_0.15_160/0.35)] transition-all duration-300 ease-out hover:-translate-y-0.5 hover:shadow-[0_0_20px_-4px_oklch(0.72_0.15_160/0.4)] active:scale-[0.97]"
+              className="mx-auto mt-2 min-h-11 w-full max-w-xs rounded-full bg-primary px-6 py-2.5 text-sm font-semibold text-primary-foreground shadow-[0_0_16px_-6px_oklch(0.72_0.15_160/0.35)] transition-all duration-300 ease-out hover:-translate-y-0.5 hover:shadow-[0_0_20px_-4px_oklch(0.72_0.15_160/0.4)] active:scale-[0.97] focus-ring"
             >
               {activity.ctaLabel}
             </button>

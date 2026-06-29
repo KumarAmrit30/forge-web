@@ -11,7 +11,9 @@ export function AppShell({ children }: { children: React.ReactNode }) {
     <HydrationGate>
       <OnboardingDialog />
       <NotificationSync />
-      <div className="mx-auto min-h-screen max-w-lg pb-24">{children}</div>
+      <div className="mx-auto min-h-dvh w-full max-w-lg overflow-x-hidden pb-28">
+        {children}
+      </div>
       <BottomNav />
       <Toaster position="top-center" richColors />
     </HydrationGate>

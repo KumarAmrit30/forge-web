@@ -1,5 +1,5 @@
-import { CalendarScreen } from "@/components/calendar/CalendarScreen";
+import { redirect } from "next/navigation";
 
 export default function CalendarPage() {
-  return <CalendarScreen />;
+  redirect("/analytics?tab=calendar");
 }

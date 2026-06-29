@@ -17,7 +17,7 @@ export function computeWeeklyMetrics(weekStart: string): WeeklyMetrics {
   const days = getWeekDays(weekStart);
   const calendar = useCalendarStore.getState().days;
   const profile = useSettingsStore.getState().profile;
-  const habits = useHabitStore.getState().habits.filter((h) => h.active);
+  const habits = useHabitStore.getState().habits.filter((h) => !h.archived);
   const completions = useHabitStore.getState().completions;
 
   let sleepTotal = 0;

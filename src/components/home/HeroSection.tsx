@@ -22,7 +22,7 @@ export function HeroSection({
   const briefLines = brief.filter(Boolean);
 
   return (
-    <section className="relative min-h-[224px] pb-8">
+    <section className="relative min-h-[200px] overflow-hidden pb-6">
       <div
         aria-hidden
         className="pointer-events-none absolute -right-16 top-0 h-64 w-64 rounded-full bg-primary/[0.13] blur-[72px]"

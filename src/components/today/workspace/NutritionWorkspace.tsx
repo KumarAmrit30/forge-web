@@ -8,6 +8,7 @@ import { todayKey } from "@/lib/date-utils";
 import { HomeSurfaceCard } from "@/components/home/home-ui";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { HabitsPanel } from "@/components/today/workspace/HabitsPanel";
 
 export function NutritionWorkspace() {
   const todayDate = todayKey();
@@ -24,23 +25,26 @@ export function NutritionWorkspace() {
   }, []);
 
   return (
-    <HomeSurfaceCard elevation="insight" className="space-y-4 px-6 py-5">
-      <div>
-        <Label className="text-xs text-muted-foreground">
-          Protein logged today
-        </Label>
-        <Input
-          type="number"
-          value={record.proteinG || ""}
-          onChange={(e) =>
-            saveProtein(parseInt(e.target.value, 10) || 0)
-          }
-          className="mt-2"
-        />
-        <p className="mt-2 text-sm text-muted-foreground">
-          Goal: {proteinGoal}g
-        </p>
-      </div>
-    </HomeSurfaceCard>
+    <div className="space-y-4">
+      <HomeSurfaceCard elevation="insight" className="space-y-4 px-6 py-5">
+        <div>
+          <Label className="text-xs text-muted-foreground">
+            Protein logged today
+          </Label>
+          <Input
+            type="number"
+            value={record.proteinG || ""}
+            onChange={(e) =>
+              saveProtein(parseInt(e.target.value, 10) || 0)
+            }
+            className="mt-2"
+          />
+          <p className="mt-2 text-sm text-muted-foreground">
+            Goal: {proteinGoal}g
+          </p>
+        </div>
+      </HomeSurfaceCard>
+      <HabitsPanel />
+    </div>
   );
 }

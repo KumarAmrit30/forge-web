@@ -45,21 +45,28 @@ const elevationStyles: Record<HomeCardElevation, string> = {
   ),
 };
 
+/** Shared card padding — use on all elevated surfaces for consistency. */
+export const FORGE_CARD_PADDING = "px-5 py-4 sm:px-6 sm:py-5";
+
 /** Elevated surface card — elevation varies by role on the page. */
 export function HomeSurfaceCard({
   children,
   className,
   elevation = "insight",
+  interactive = false,
 }: {
   children: React.ReactNode;
   className?: string;
   elevation?: HomeCardElevation;
+  interactive?: boolean;
 }) {
   return (
     <div
       className={cn(
-        "relative overflow-hidden rounded-[24px] border",
+        "relative overflow-hidden forge-card-radius border",
         elevationStyles[elevation],
+        interactive &&
+          "transition-transform duration-200 active:scale-[0.99]",
         className
       )}
     >

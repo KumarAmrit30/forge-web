@@ -12,6 +12,7 @@ import type {
 } from "@/lib/execution/execution-types";
 import { getCalendarSnapshot, useCalendarStore } from "@/stores/calendarStore";
 import { getSettingsSnapshot, useSettingsStore } from "@/stores/settingsStore";
+import { importLegacyRoutineArrays } from "@/lib/routine-sync";
 import { getWorkoutSnapshot, useWorkoutStore } from "@/stores/workoutStore";
 
 function output(
@@ -212,6 +213,7 @@ const updateRoutineHandler: ExecutionHandler = {
         : settings.nightRoutineItems;
 
     useSettingsStore.getState().setRoutineItems(morning, night);
+    importLegacyRoutineArrays(morning, night);
 
     return output(
       {
@@ -233,6 +235,7 @@ const updateRoutineHandler: ExecutionHandler = {
       morning as string[],
       night as string[]
     );
+    importLegacyRoutineArrays(morning as string[], night as string[]);
     return output(
       _newValues,
       { morningRoutineItems: morning, nightRoutineItems: night },

@@ -15,6 +15,8 @@ import {
   buildExecutionTimeline,
   useExecutionFlow,
 } from "@/lib/execution-ui";
+import { PageShell } from "@/components/ui/page-shell";
+import { Skeleton } from "@/components/ui/skeleton";
 
 export function ForgeScreen() {
   const profile = useSettingsStore((s) => s.profile);
@@ -60,20 +62,22 @@ export function ForgeScreen() {
 
   if (!viewModel) {
     return (
-      <div className="px-6 pt-8">
-        <div className="h-48 animate-pulse rounded-[24px] bg-white/[0.03]" />
-      </div>
+      <PageShell className="space-y-4 pb-10">
+        <Skeleton className="h-32 w-full rounded-[24px]" />
+        <Skeleton className="h-24 w-full rounded-[24px]" />
+        <Skeleton className="h-12 w-full rounded-full" />
+      </PageShell>
     );
   }
 
   return (
-    <div className="relative mx-auto w-full max-w-lg">
+    <PageShell className="overflow-hidden pb-10">
       <div
         aria-hidden
         className="pointer-events-none absolute inset-x-0 top-0 h-80 bg-[radial-gradient(ellipse_70%_55%_at_50%_0%,oklch(0.72_0.15_160/0.05),transparent_68%)]"
       />
 
-      <div className="relative px-6 pt-8 pb-10">
+      <div className="relative">
         {!hasConversation && <ForgeHero hero={viewModel.hero} />}
 
         {!hasConversation && (
@@ -129,6 +133,6 @@ export function ForgeScreen() {
         onUndo={executionFlow.undoLast}
         onDismiss={executionFlow.dismissBanner}
       />
-    </div>
+    </PageShell>
   );
 }

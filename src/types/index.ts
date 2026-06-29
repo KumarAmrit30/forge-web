@@ -15,6 +15,8 @@ export type HabitCategory =
   | "Learning"
   | "Custom";
 
+export type { Habit } from "@/types/habit";
+
 export type Goal = {
   id: string;
   title: string;
@@ -23,15 +25,6 @@ export type Goal = {
   target: number;
   unit: string;
   deadline?: string;
-  active: boolean;
-};
-
-export type Habit = {
-  id: string;
-  title: string;
-  category: HabitCategory;
-  frequency: "daily" | "weekly";
-  weeklyDays?: string[];
   active: boolean;
 };
 

@@ -6,6 +6,7 @@ import { useProgressStore } from "@/stores/progressStore";
 import { updateTodayRecord } from "@/lib/sync-day";
 import { todayKey } from "@/lib/date-utils";
 import { GlassCard } from "@/components/shared/GlassCard";
+import { EmptyState } from "@/components/ui/empty-state";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Check, Dumbbell } from "lucide-react";
@@ -34,8 +35,12 @@ export function WorkoutSessionPanel() {
 
   if (!nextDay) {
     return (
-      <GlassCard>
-        <p className="text-sm text-muted-foreground">No workout plan configured.</p>
+      <GlassCard className="!p-0">
+        <EmptyState
+          icon={Dumbbell}
+          title="No workout logged today."
+          description="Configure your training plan in settings to start tracking sessions."
+        />
       </GlassCard>
     );
   }

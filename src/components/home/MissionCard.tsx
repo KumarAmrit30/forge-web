@@ -23,9 +23,9 @@ export function MissionCard({ mission }: Props) {
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.45, ease: easeOut, delay: 0.1 }}
     >
-      <Link href={mission.href} className="group block">
-        <HomeSurfaceCard elevation="mission" className="px-6 py-6">
-          <HomeSectionLabel>Today&apos;s Mission</HomeSectionLabel>
+      <Link href={mission.href} className="group block focus-ring rounded-[24px]">
+        <HomeSurfaceCard elevation="mission" interactive className="px-5 py-5 sm:px-6 sm:py-6">
+          <HomeSectionLabel>Today&apos;s Focus</HomeSectionLabel>
 
           <div className="mt-4 flex items-center gap-4">
             <div className="relative h-24 w-24 shrink-0">

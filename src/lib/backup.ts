@@ -20,6 +20,11 @@ import {
   hydrateNotifications,
 } from "@/stores/notificationStore";
 import {
+  getRoutineSnapshot,
+  hydrateRoutines,
+} from "@/stores/routineStore";
+import { migrateRoutinesFromSettingsIfNeeded } from "@/lib/routine-sync";
+import {
   exportPhotosAsBase64,
   importPhotosFromBase64,
 } from "@/lib/photo-storage";
@@ -40,6 +45,7 @@ type BackupData = {
     weeklyReview: ReturnType<typeof getWeeklyReviewSnapshot>;
     checkpoints: ReturnType<typeof getCheckpointSnapshot>;
     notifications: ReturnType<typeof getNotificationSnapshot>;
+    routines?: ReturnType<typeof getRoutineSnapshot>;
   };
   photos?: Record<string, string>;
 };
@@ -57,6 +63,7 @@ function collectStoreData(): BackupData["stores"] {
     weeklyReview: getWeeklyReviewSnapshot(),
     checkpoints: getCheckpointSnapshot(),
     notifications: getNotificationSnapshot(),
+    routines: getRoutineSnapshot(),
   };
 }
 
@@ -72,6 +79,11 @@ function hydrateAllStores(stores: BackupData["stores"]): void {
   hydrateWeeklyReview(stores.weeklyReview);
   hydrateCheckpoints(stores.checkpoints);
   hydrateNotifications(stores.notifications);
+  if (stores.routines) {
+    hydrateRoutines(stores.routines);
+  } else if (stores.settings) {
+    migrateRoutinesFromSettingsIfNeeded();
+  }
 }
 
 export async function exportDataBackup(): Promise<void> {

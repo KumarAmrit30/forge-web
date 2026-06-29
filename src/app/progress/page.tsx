@@ -1,5 +1,5 @@
-import { ProgressScreen } from "@/components/progress/ProgressScreen";
+import { redirect } from "next/navigation";
 
 export default function ProgressPage() {
-  return <ProgressScreen />;
+  redirect("/analytics");
 }

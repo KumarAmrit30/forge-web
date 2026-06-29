@@ -1,5 +1,5 @@
-import { SettingsContent } from "@/components/settings/SettingsContent";
+import { SettingsHub } from "@/components/settings/SettingsHub";
 
 export default function SettingsPage() {
-  return <SettingsContent />;
+  return <SettingsHub />;
 }

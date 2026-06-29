@@ -19,7 +19,7 @@ export function TodayProgress({ completed, total }: Props) {
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       transition={{ duration: 0.35, ease: easeOut, delay: 0.18 }}
-      className="mt-6 border-t border-white/[0.03] pt-4 pb-6"
+      className="mt-5 border-t border-white/[0.03] pt-4 pb-4"
     >
       <div className="flex items-center gap-2.5">
         <div className="relative h-8 w-8 shrink-0">

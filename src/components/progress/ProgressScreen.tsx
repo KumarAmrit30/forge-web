@@ -13,6 +13,7 @@ import { HabitEvolution } from "@/components/progress/HabitEvolution";
 import { Milestones } from "@/components/progress/Milestones";
 import { ForgeInsight } from "@/components/progress/ForgeInsight";
 import { ProgressStats } from "@/components/progress/ProgressStats";
+import { PageShell } from "@/components/ui/page-shell";
 
 export function ProgressScreen() {
   const calendarDays = useCalendarStore((s) => s.days);
@@ -43,13 +44,13 @@ export function ProgressScreen() {
   );
 
   return (
-    <div className="relative mx-auto w-full max-w-lg">
+    <PageShell className="overflow-hidden pb-8">
       <div
         aria-hidden
         className="pointer-events-none absolute inset-x-0 top-0 h-96 bg-[radial-gradient(ellipse_70%_55%_at_50%_0%,oklch(0.72_0.15_160/0.05),transparent_68%)]"
       />
 
-      <div className="relative px-6 pt-8">
+      <div className="relative pt-4">
         <ProgressHero hero={model.hero} />
         <MonthlyReflection reflection={model.monthlyReflection} />
         <GrowthTimeline events={model.timeline} />
@@ -58,6 +59,6 @@ export function ProgressScreen() {
         <ForgeInsight insight={model.insight} />
         <ProgressStats stats={model.stats} />
       </div>
-    </div>
+    </PageShell>
   );
 }

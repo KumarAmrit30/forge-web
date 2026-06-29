@@ -13,6 +13,7 @@ import { CalendarHeader } from "@/components/calendar/CalendarHeader";
 import { CalendarSummary } from "@/components/calendar/CalendarSummary";
 import { CalendarGrid } from "@/components/calendar/CalendarGrid";
 import { CalendarBottomSheet } from "@/components/calendar/CalendarBottomSheet";
+import { PageShell } from "@/components/ui/page-shell";
 
 export function CalendarScreen() {
   const [viewDate, setViewDate] = useState(() => new Date());
@@ -67,7 +68,7 @@ export function CalendarScreen() {
   };
 
   return (
-    <div className="relative mx-auto w-full max-w-lg">
+    <PageShell className="overflow-hidden pb-28">
       <div
         aria-hidden
         className="pointer-events-none absolute inset-x-0 top-0 h-80 bg-[radial-gradient(ellipse_70%_55%_at_50%_-5%,oklch(0.72_0.15_160/0.045),transparent_68%)]"
@@ -80,7 +81,7 @@ export function CalendarScreen() {
         />
       )}
 
-      <div className="relative px-6 pt-6 pb-28">
+      <div className="relative">
         <CalendarHeader
           viewDate={viewDate}
           onPrev={handlePrevMonth}
@@ -108,6 +109,6 @@ export function CalendarScreen() {
           onClose={() => setSheetOpen(false)}
         />
       )}
-    </div>
+    </PageShell>
   );
 }

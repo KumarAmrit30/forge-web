@@ -17,9 +17,9 @@ export function ForgeInsight({ insight, learnWhyHref }: Props) {
       initial={{ opacity: 0, y: 8 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.4, ease: easeOut, delay: 0.24 }}
-      className="mt-8"
+      className="forge-section-gap"
     >
-      <HomeSurfaceCard elevation="insight" className="px-6 py-5">
+      <HomeSurfaceCard elevation="insight" className="px-5 py-4 sm:px-6 sm:py-5">
         <div className="flex items-start gap-4">
           <div className="relative h-16 w-16 shrink-0">
             <Image

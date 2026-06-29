@@ -31,8 +31,8 @@ const item = {
 
 export function TodayJourney({ journey }: Props) {
   return (
-    <section className="mt-8">
-      <HomeSectionLabel className="mb-6">Today&apos;s Journey</HomeSectionLabel>
+    <section className="forge-section-gap">
+      <HomeSectionLabel className="mb-4">Today&apos;s Journey</HomeSectionLabel>
 
       <LayoutGroup>
         <motion.ul
@@ -52,7 +52,7 @@ export function TodayJourney({ journey }: Props) {
               key={step.id}
               layout
               variants={item}
-              className="relative flex items-center gap-4 pb-8 last:pb-0"
+              className="relative flex items-center gap-4 pb-5 last:pb-0"
             >
               <TodayJourneyItem step={step} />
             </motion.li>

@@ -6,10 +6,11 @@ import {
   useWorkoutStore,
   createExerciseFromSeed,
 } from "@/stores/workoutStore";
-import { useHabitStore } from "@/stores/habitStore";
+import { seedHabits } from "@/stores/habitStore";
 import { useBlueprintStore } from "@/stores/blueprintStore";
 import { useNotificationStore } from "@/stores/notificationStore";
-import type { Goal, Habit, HabitCategory, WorkoutDay } from "@/types";
+import { seedPeriodRoutine, useRoutineStore } from "@/stores/routineStore";
+import type { Goal, HabitCategory, WorkoutDay } from "@/types";
 import { LIFE_AREAS } from "@/types";
 
 const HABIT_CATEGORIES: Record<string, HabitCategory> = {
@@ -66,14 +67,12 @@ export function runSeed(): void {
   ];
   useGoalStore.getState().setGoals(goalModels);
 
-  const habits: Habit[] = customHabits.map((title) => ({
-    id: generateId(),
-    title,
-    category: HABIT_CATEGORIES[title] ?? "Custom",
-    frequency: "daily" as const,
-    active: true,
-  }));
-  useHabitStore.getState().setHabits(habits);
+  seedHabits(
+    customHabits.map((title) => ({
+      title,
+      category: HABIT_CATEGORIES[title] ?? "Custom",
+    }))
+  );
 
   const days: WorkoutDay[] = workoutPlan.map((d, i) => ({
     id: generateId(),
@@ -180,6 +179,10 @@ export function runSeed(): void {
   ];
 
   useSettingsStore.getState().setRoutineItems(morningRoutine, nightRoutine);
+
+  seedPeriodRoutine("morning", "Morning Routine", morningRoutine);
+  seedPeriodRoutine("night", "Evening Routine", nightRoutine);
+  useRoutineStore.setState({ migratedFromSettings: true });
 
   bp.setSection("dietPlan", formatSection("Diet Plan", [
     `Calories: ${nutrition.calories}`,

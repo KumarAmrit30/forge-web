@@ -2,11 +2,14 @@
 
 import { useEffect, useState } from "react";
 import { runSeed } from "@/lib/seed";
+import { migrateRoutinesFromSettingsIfNeeded } from "@/lib/routine-sync";
+import { migrateHabitsFromStorageIfNeeded } from "@/stores/habitStore";
+import { syncHabitsToTodayRecord } from "@/lib/sync-habits";
 import { syncGoalsFromMetrics } from "@/lib/goals-sync";
 import { refreshWaterStreaks } from "@/lib/streaks";
 import { syncTodayFromStores } from "@/lib/sync-day";
 import { waitForForgeHydration } from "@/lib/hydration";
-import { Loader2 } from "lucide-react";
+import { PageSkeleton } from "@/components/ui/page-skeleton";
 
 export function HydrationGate({ children }: { children: React.ReactNode }) {
   const [ready, setReady] = useState(false);
@@ -16,6 +19,9 @@ export function HydrationGate({ children }: { children: React.ReactNode }) {
     waitForForgeHydration().then(() => {
       if (!mounted) return;
       runSeed();
+      migrateRoutinesFromSettingsIfNeeded();
+      migrateHabitsFromStorageIfNeeded();
+      syncHabitsToTodayRecord();
       syncGoalsFromMetrics();
       refreshWaterStreaks();
       syncTodayFromStores();
@@ -28,9 +34,8 @@ export function HydrationGate({ children }: { children: React.ReactNode }) {
 
   if (!ready) {
     return (
-      <div className="flex min-h-[60vh] flex-col items-center justify-center gap-3 px-4">
-        <Loader2 className="h-8 w-8 animate-spin text-emerald-500" />
-        <p className="text-sm text-muted-foreground">Loading Forge…</p>
+      <div aria-busy="true" aria-label="Loading Forge">
+        <PageSkeleton />
       </div>
     );
   }

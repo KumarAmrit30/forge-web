@@ -13,6 +13,7 @@ import { syncRemindersToSW } from "@/lib/notifications";
 import { todayKey } from "@/lib/date-utils";
 import { easeOut } from "@/components/home/motion";
 import { HomeSectionLabel } from "@/components/home/home-ui";
+import { PageShell } from "@/components/ui/page-shell";
 import { TodayFocusCard } from "@/components/today/TodayFocusCard";
 import { ActivityWorkspace } from "@/components/today/ActivityWorkspace";
 import { TodayNextCard } from "@/components/today/TodayNextCard";
@@ -106,15 +107,15 @@ export function TodayScreen() {
   );
 
   return (
-    <div className="relative mx-auto w-full max-w-lg">
+    <PageShell className="overflow-hidden pb-2">
       <div
         aria-hidden
-        className="pointer-events-none absolute inset-x-0 top-0 h-64 bg-[radial-gradient(ellipse_80%_50%_at_50%_0%,oklch(0.72_0.15_160/0.04),transparent_65%)]"
+        className="pointer-events-none absolute inset-x-0 top-0 h-56 bg-[radial-gradient(ellipse_80%_50%_at_50%_0%,oklch(0.72_0.15_160/0.04),transparent_65%)]"
       />
 
-      <div className="relative px-6 pt-6">
+      <div className="relative">
         {model.focus && (
-          <HomeSectionLabel className="mb-4">Right Now</HomeSectionLabel>
+          <HomeSectionLabel className="mb-3">Right Now</HomeSectionLabel>
         )}
 
         {model.focus ? (
@@ -124,7 +125,7 @@ export function TodayScreen() {
             onQuickAction={handleQuickWater}
           />
         ) : (
-          <div className="py-16 text-center">
+          <div className="py-12 text-center">
             <p className="font-serif text-2xl text-white">Today is complete</p>
             <p className="mt-2 text-sm text-muted-foreground">
               Rest well — you earned it.
@@ -157,6 +158,6 @@ export function TodayScreen() {
           )}
         </AnimatePresence>
       </div>
-    </div>
+    </PageShell>
   );
 }
